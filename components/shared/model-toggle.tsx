@@ -25,44 +25,46 @@ const ModeToggle = () => {
     return null;
   }
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="focus-visible:ring-0 focus-visible:ring-offset-0"
-        >
-          {theme === "system" ? (
-            <SunMoon />
-          ) : theme === "dark" ? (
-            <MoonIcon />
-          ) : (
-            <SunIcon />
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-        <DropdownMenuSeparator></DropdownMenuSeparator>
-        <DropdownMenuCheckboxItem
-          checked={theme === "system"}
-          onClick={() => setTheme("system")}
-        >
-          System
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={theme === "light"}
-          onClick={() => setTheme("light")}
-        >
-          Light
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={theme === "dark"}
-          onClick={() => setTheme("dark")}
-        >
-          Dark
-        </DropdownMenuCheckboxItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="focus-visible:ring-0 focus-visible:ring-offset-0"
+          >
+            {theme === "system" ? (
+              <SunMoon />
+            ) : theme === "dark" ? (
+              <MoonIcon />
+            ) : (
+              <SunIcon />
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+          <DropdownMenuSeparator></DropdownMenuSeparator>
+          <DropdownMenuCheckboxItem
+            checked={theme === "system"}
+            onClick={() => setTheme("system")}
+          >
+            System
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={theme === "light"}
+            onClick={() => setTheme("light")}
+          >
+            Light
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={theme === "dark"}
+            onClick={() => setTheme("dark")}
+          >
+            Dark
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };
 

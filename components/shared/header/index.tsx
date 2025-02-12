@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/lib/constants";
 import { ShoppingCart, UserIcon } from "lucide-react";
-import ModeToggle from "./model-toggle";
+import ModeToggle from "../model-toggle";
 
 const Header = () => {
   return (
@@ -23,7 +23,7 @@ const Header = () => {
             </span>
           </Link>
         </div>
-        <div className="space-x-2">
+        <div className="flex">
           <ModeToggle />
           <Button asChild variant="ghost">
             <Link href="/cart">

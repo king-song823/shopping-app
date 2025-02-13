@@ -1,4 +1,5 @@
 import ProductCard from "./product-card";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ProductList = ({ data, title }: { data: any; title?: string }) => {
   return (
     <div className="my-10">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/lib/constants";
 import { ShoppingCart, UserIcon } from "lucide-react";
 import ModeToggle from "../model-toggle";
+import Menu from "./menu";
 
 const Header = () => {
   return (
@@ -23,7 +24,8 @@ const Header = () => {
             </span>
           </Link>
         </div>
-        <div className="flex">
+        <Menu />
+        {/* <div className="flex">
           <ModeToggle />
           <Button asChild variant="ghost">
             <Link href="/cart">
@@ -37,7 +39,7 @@ const Header = () => {
               Sign In
             </Link>
           </Button>
-        </div>
+        </div> */}
       </div>
     </header>
   );

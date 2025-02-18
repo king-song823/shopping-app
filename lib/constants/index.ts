@@ -7,3 +7,15 @@ export const SERVER_URL =
 
 export const LATEST_PRODUCTS_LIMIT =
   Number(process.env.LATEST_PRODUCTS_LIMIT) || 4;
+
+export const signInDefaultValues = {
+  email: 'yueseduomehao@gmail.com',
+  password: '123456',
+};
+
+export const signUpDefaultValues = {
+  name: 'KingSong',
+  email: 'yueseduomehao@gmail.com',
+  password: '123456',
+  confirmPassword: '123456',
+};

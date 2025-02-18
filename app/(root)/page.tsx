@@ -1,8 +1,6 @@
 import ProductList from '@/components/shared/product/product-list';
 import { getLastestProdcuts } from '@/lib/actions/product.actions';
-import { main } from '@/db/seed';
 export default async function Home() {
-  main();
   const lastestProdcuts = await getLastestProdcuts();
   return (
     <div className="space-y-8">

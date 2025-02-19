@@ -7,6 +7,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/db/prisma';
 import { cartItemSchema, insertCartSchema } from '../validator';
 import { revalidatePath } from 'next/cache';
+import { Prisma } from '@prisma/client';
 
 // Calculate cart price based on items
 const calcPrice = (items: CartItem[]) => {
@@ -41,7 +42,6 @@ export async function addItemToCart(data: CartItem) {
         id: item.productId,
       },
     });
-    console.log('product', product);
     if (!product) throw new Error('Product not found');
     // Get cart from database
     const cart = await getMyCart();
@@ -65,15 +65,43 @@ export async function addItemToCart(data: CartItem) {
         success: true,
         message: 'Item added to cart successfully',
       };
+    } else {
+      // Check for existing item in cart
+      const existItem = (cart.items as CartItem[]).find(
+        (i) => i.productId === item.productId
+      );
+
+      // if not enough stock, threw error
+      if (existItem) {
+        if (product.stock < existItem.qty + 1) {
+          throw new Error(' Not enough stock');
+        }
+
+        // Increase quanitily of existing item
+        cart.items.find((i) => i.productId === item.productId)!.qty =
+          existItem.qty + 1;
+      } else {
+        // If stock, add item to cart
+        if (product.stock < 1) throw new Error('Not enough stock');
+        cart.items.push(item);
+      }
+      // Save to database
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: {
+          items: cart.items as Prisma.CartUpdateitemsInput[],
+          ...calcPrice(cart.items as CartItem[]),
+        },
+      });
+      revalidatePath(`/product/${product.slug}`);
+
+      return {
+        success: true,
+        message: `${product.name} ${
+          existItem ? 'updated in' : 'added to'
+        } cart successfully`,
+      };
     }
-
-    // Revalidate product page
-    revalidatePath(`/product/${product.slug}`);
-
-    return {
-      success: true,
-      message: 'Item added to cart successfully',
-    };
   } catch (error) {
     return {
       success: false,

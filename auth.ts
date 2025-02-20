@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { compareSync } from 'bcrypt-ts-edge';
 import NextAuth, { NextAuthConfig } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -6,21 +7,7 @@ import { NextResponse } from 'next/server';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from '@/db/prisma';
 
-interface CustomSessionUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
-
-interface CustomToken {
-  id?: string;
-  name?: string;
-  role?: string;
-  email?: string;
-}
-
-async function handleDefaultName(user: CustomSessionUser) {
+async function handleDefaultName(user: any) {
   if (user.name === 'NO_NAME') {
     const defaultName = user.email!.split('@')[0];
     await prisma.user.update({
@@ -77,25 +64,13 @@ const config = {
     }),
   ],
   callbacks: {
-    session({
-      session,
-      token,
-    }: {
-      session: { user: CustomSessionUser };
-      token: CustomToken;
-    }) {
+    session({ session, token }: { session: any; token: any }) {
       session.user.id = token.id!;
       session.user.name = token.name!;
       session.user.role = token.role!;
       return session;
     },
-    async jwt({
-      token,
-      user,
-    }: {
-      token: CustomToken;
-      user?: CustomSessionUser;
-    }) {
+    async jwt({ token, user }: { token: any; user?: any }) {
       if (user) {
         token.role = user.role;
         token.id = user.id;

@@ -27,19 +27,16 @@ export const config = {
       async authorize(credentials) {
         if (credentials == null) return null;
 
-        // Find user in database
         const user = await prisma.user.findFirst({
           where: {
             email: credentials.email as string,
           },
         });
-        // Check if user exists and password is correct
         if (user && user.password) {
           const isMatch = compareSync(
             credentials.password as string,
             user.password
           );
-          // If password is correct, return user object
           if (isMatch) {
             return {
               id: user.id,
@@ -49,7 +46,6 @@ export const config = {
             };
           }
         }
-        // If user doesn't exist or password is incorrect, return null
         return null;
       },
     }),
@@ -57,30 +53,24 @@ export const config = {
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async session({ session, token, trigger }: any) {
-      // Map the token data to the session object
       session.user.id = token.id;
-      session.user.name = token.name; // 👈 Add this line
-      session.user.role = token.role; // 👈 Add this line
+      session.user.name = token.name;
+      session.user.role = token.role;
 
-      // Optionally handle session updates (like name change)
       if (trigger === 'update' && token.name) {
         session.user.name = token.name;
       }
 
-      // Return the updated session object
       return session;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async jwt({ token, user, trigger, session }: any) {
-      // Assign user fields to token
       if (user) {
         token.role = user.role;
         token.id = user.id;
-        // If user has no name, use email as their default name
         if (user.name === 'NO_NAME') {
           token.name = user.email!.split('@')[0];
 
-          // Update the user in the database with the new name
           await prisma.user.update({
             where: { id: user.id },
             data: { name: token.name },
@@ -88,7 +78,6 @@ export const config = {
         }
       }
 
-      // Handle session updates (e.g., name change)
       if (session?.user.name && trigger === 'update') {
         token.name = session.user.name;
       }
@@ -97,20 +86,15 @@ export const config = {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     authorized({ request }: any) {
-      // Check for cart cookie
       if (!request.cookies.get('sessionCartId')) {
-        // Generate cart cookied
         const sessionCartId = crypto.randomUUID();
-        // Clone thre request headers
         const newRequestHeaders = new Headers(request.headers);
-        // Create a new response and add the new headers
         const response = NextResponse.next({
           request: {
             headers: newRequestHeaders,
           },
         });
 
-        // Set the newly genarated sessionCartId in the response cookie
         response.cookies.set('sessionCartId', sessionCartId);
         return response;
       }

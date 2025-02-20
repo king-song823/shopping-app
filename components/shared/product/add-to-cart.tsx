@@ -14,7 +14,7 @@ const AddToCart = ({
   cart,
   item,
 }: {
-  cart: Cart;
+  cart?: Cart;
   item: Omit<CartItem, 'cartId'>;
 }) => {
   const router = useRouter();

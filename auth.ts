@@ -5,7 +5,7 @@ import type { NextAuthConfig } from 'next-auth';
 
 import { prisma } from '@/db/prisma';
 import { PrismaAdapter } from '@auth/prisma-adapter';
-// import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export const config = {
   pages: {
@@ -97,26 +97,26 @@ export const config = {
       return token;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // authorized({ request }: any) {
-    //   // Check for cart cookie
-    //   if (!request.cookies.get('sessionCartId')) {
-    //     // Generate cart cookied
-    //     const sessionCartId = crypto.randomUUID();
-    //     // Clone thre request headers
-    //     const newRequestHeaders = new Headers(request.headers);
-    //     // Create a new response and add the new headers
-    //     const response = NextResponse.next({
-    //       request: {
-    //         headers: newRequestHeaders,
-    //       },
-    //     });
+    authorized({ request }: any) {
+      // Check for cart cookie
+      if (!request.cookies.get('sessionCartId')) {
+        // Generate cart cookied
+        const sessionCartId = crypto.randomUUID();
+        // Clone thre request headers
+        const newRequestHeaders = new Headers(request.headers);
+        // Create a new response and add the new headers
+        const response = NextResponse.next({
+          request: {
+            headers: newRequestHeaders,
+          },
+        });
 
-    //     // Set the newly genarated sessionCartId in the response cookie
-    //     response.cookies.set('sessionCartId', sessionCartId);
-    //     return response;
-    //   }
-    //   return true;
-    // },
+        // Set the newly genarated sessionCartId in the response cookie
+        response.cookies.set('sessionCartId', sessionCartId);
+        return response;
+      }
+      return true;
+    },
   },
 } satisfies NextAuthConfig;
 

@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import ProductPrice from '@/components/shared/product/product-price';
 import ProductImages from '@/components/shared/product/product-images';
 import AddToCart from '@/components/shared/product/add-to-cart';
+import { getMyCart } from '@/lib/actions/cart.action';
 const ProductDetailsPage = async (props: {
   params: Promise<{ slug: string }>;
 }) => {
@@ -12,6 +13,7 @@ const ProductDetailsPage = async (props: {
   const { slug } = params;
   const product = await getProductBySlug(slug);
   if (!product) return notFound;
+  const cart = await getMyCart();
   return (
     <>
       <section>
@@ -65,6 +67,8 @@ const ProductDetailsPage = async (props: {
                 {product.stock > 0 && (
                   <div className=" flex-center">
                     <AddToCart
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      cart={cart as any}
                       item={{
                         productId: product.id,
                         name: product.name,

@@ -98,6 +98,23 @@ export const config = {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     authorized({ request }: any) {
+      // Array of regex patterns of protected paths
+      const protectedPaths = [
+        /\/shipping-address/,
+        /\/payment-method/,
+        /\/place-order/,
+        /\/profile/,
+        /\/user\/(.*)/,
+        /\/order\/(.*)/,
+        /\/admin/,
+      ];
+      // Get pathname from the req URL object
+      const { pathname } = request.nextUrl;
+
+      console.log('pathname', pathname);
+
+      // Check if user is not authenticated and on a protected path
+      if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
       // Check for cart cookie
       if (!request.cookies.get('sessionCartId')) {
         // Generate cart cookied

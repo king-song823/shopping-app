@@ -80,9 +80,9 @@ export const shippingAddressSchema = z.object({
 });
 
 // Schema for paymemtMethods
-export const paymentMethodsSchema = z
+export const paymentMethodSchema = z
   .object({
-    type: z.string().min(1, 'Payment method is reqiured'),
+    type: z.string().min(1, 'Payment method is required'),
   })
   .refine((data) => PAYMENT_METHODS.includes(data.type), {
     path: ['type'],

@@ -2,7 +2,7 @@
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { auth, signIn, signOut } from '@/auth';
 import {
-  paymentMethodsSchema,
+  paymentMethodSchema,
   shippingAddressSchema,
   signInFormSchema,
   signUpFormSchema,
@@ -120,7 +120,7 @@ export async function updateUserAddress(data: ShippingAddress) {
 
 // Update payment methods
 export async function updateUserPaymentMethod(
-  data: z.infer<typeof paymentMethodsSchema>
+  data: z.infer<typeof paymentMethodSchema>
 ) {
   try {
     // check user is exsit
@@ -128,7 +128,7 @@ export async function updateUserPaymentMethod(
     const currentUser = await getUserById(session?.user?.id as string);
     if (!currentUser) throw new Error('User not found');
     // params
-    const params = paymentMethodsSchema.parse(data);
+    const params = paymentMethodSchema.parse(data);
     await prisma.user.update({
       where: {
         id: currentUser.id,

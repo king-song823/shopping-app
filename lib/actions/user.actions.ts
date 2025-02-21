@@ -86,13 +86,9 @@ export async function updateUserAddress(data: ShippingAddress) {
   try {
     // find userId
     const session = await auth();
-    const userId = session?.user?.id;
     // find user
-    const currentUser = await prisma.user.findFirst({
-      where: {
-        id: userId,
-      },
-    });
+    const currentUser = await getUserById(session?.user?.id as string);
+    console.log('currentUser', currentUser);
     if (!currentUser) throw new Error('User not found');
 
     // update user address

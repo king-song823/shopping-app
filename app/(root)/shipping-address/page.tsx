@@ -3,6 +3,10 @@ import { getMyCart } from '@/lib/actions/cart.action';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import ShippingAddressForm from './shipping-address-form';
+import CheckoutSteps from '@/components/shared/check-steps';
+import { getUserById } from '@/lib/actions/user.actions';
+import { ShippingAddress } from '@/types';
+
 export const metadata: Metadata = {
   title: 'Shipping Address',
 };
@@ -11,12 +15,14 @@ const ShippingAddressPage = async () => {
   if (!cart || cart.items.length === 0) redirect('/cart');
   const session = await auth();
 
-  const userId = session?.user?.id;
-  if (!userId) throw new Error('User ID not found');
+  const user = await getUserById(session?.user?.id as string);
 
   return (
     <>
-      <ShippingAddressForm address={null}></ShippingAddressForm>
+      <CheckoutSteps current={1} />
+      <ShippingAddressForm
+        address={user.address as ShippingAddress}
+      ></ShippingAddressForm>
     </>
   );
 };

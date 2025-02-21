@@ -9,18 +9,28 @@ import {
 } from '@/components/ui/sheet';
 import Link from 'next/link';
 import ModeToggle from '../model-toggle';
+import { auth } from '@/auth';
 
-const Menu = () => {
+const Menu = async () => {
+  const user = await auth();
+  console.log('user111', user);
   return (
     <>
       <div className="flex justify-end gap-3">
         <nav className="md:flex hidden w-full max-w-xs gap-1">
           <ModeToggle />
           <Button asChild variant="ghost">
-            <Link href="/cart">
-              <ShoppingCart />
-              Cart
-            </Link>
+            {user ? (
+              <Link href="/cart">
+                <ShoppingCart />
+                Cart
+              </Link>
+            ) : (
+              <Link href="/sign-in">
+                <ShoppingCart />
+                Cart
+              </Link>
+            )}
           </Button>
           <UserButton />
         </nav>
@@ -33,10 +43,17 @@ const Menu = () => {
               <SheetTitle>Menu</SheetTitle>
               <ModeToggle />
               <Button asChild variant="ghost">
-                <Link href="/cart">
-                  <ShoppingCart />
-                  Cart
-                </Link>
+                {user ? (
+                  <Link href="/cart">
+                    <ShoppingCart />
+                    Cart
+                  </Link>
+                ) : (
+                  <Link href="/sign-in">
+                    <ShoppingCart />
+                    Cart
+                  </Link>
+                )}
               </Button>
               <UserButton />
               {/* <Button asChild>

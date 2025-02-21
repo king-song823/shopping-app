@@ -11,9 +11,11 @@ import { useTransition } from 'react';
 import { throttle } from 'lodash';
 
 const AddToCart = ({
+  userId,
   cart,
   item,
 }: {
+  userId: string;
   cart?: Cart;
   item: Omit<CartItem, 'cartId'>;
 }) => {
@@ -38,6 +40,10 @@ const AddToCart = ({
   };
   const handleAddToCart = () => {
     startTransition(async () => {
+      if (!userId) {
+        router.push('/sign-in');
+        return;
+      }
       // addItemCart
       const res = await addItemToCart(item);
 

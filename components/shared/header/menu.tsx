@@ -10,7 +10,7 @@ import {
 import Link from 'next/link';
 import ModeToggle from '../model-toggle';
 
-const Menu = () => {
+const Menu = async () => {
   return (
     <>
       <div className="flex justify-end gap-3">

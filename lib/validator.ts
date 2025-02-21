@@ -23,7 +23,6 @@ export const insertProductSchema = z.object({
 });
 
 // Schema for signing in a user
-
 export const signInFormSchema = z.object({
   email: z
     .string()
@@ -45,4 +44,36 @@ export const signUpFormSchema = z.object({
       message: "Passwords don't match",
       path: ['confirmPassword'],
     }),
+});
+
+// Schema for Cart
+export const cartItemSchema = z.object({
+  productId: z.string().min(1, 'Product is required'),
+  name: z.string().min(1, 'Name is required'),
+  slug: z.string().min(1, 'Slug is required'),
+  qty: z.number().int().nonnegative('Quantity must be a positive number'),
+  image: z.string().min(1, 'Image is required'),
+  price: currency,
+});
+
+// Schema for Insert a Cart
+export const insertCartSchema = z.object({
+  items: z.array(cartItemSchema),
+  itemsPrice: currency,
+  totalPrice: currency,
+  shippingPrice: currency,
+  taxPrice: currency,
+  sessionCartId: z.string().min(1, 'Session cart id is required'),
+  userId: z.string().optional().nullable(),
+});
+
+// Schema for shipping address
+export const shippingAddressSchema = z.object({
+  fullName: z.string().min(3, 'Name must be at least 3 characters'),
+  streetAddress: z.string().min(3, 'Address must be at least 3 characters'),
+  city: z.string().min(2, 'city must be at least 3 characters'),
+  postalCode: z.string().min(3, 'Postal code must be at least 3 characters'),
+  country: z.string().min(2, 'Country must be at least 3 characters'),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
 });

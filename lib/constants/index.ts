@@ -19,3 +19,11 @@ export const signUpDefaultValues = {
   password: '123456',
   confirmPassword: '123456',
 };
+
+export const shippingAddressDefaultValues = {
+  fullName: 'King Song',
+  streetAddress: '9栋2单元401',
+  city: '渝北',
+  postalCode: '12345',
+  country: '中国',
+};

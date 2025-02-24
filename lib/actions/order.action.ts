@@ -3,7 +3,7 @@
 import { CartItem } from '@/types';
 
 import { auth } from '@/auth';
-import { formatError } from '../utils';
+import { converToPlainObject, formatError } from '../utils';
 import { getUserById } from './user.actions';
 import { getMyCart } from './cart.action';
 import { insertOrderSchema } from '../validator';
@@ -60,8 +60,7 @@ export async function createOrder() {
     const insertedOrderId = await prisma.$transaction(async (tx) => {
       console.log('order', order);
       // Create order
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const insertedOrder = await tx.order.create({ data: order as any });
+      const insertedOrder = await tx.order.create({ data: order });
       // Create order items from the cart items
       for (const item of cart.items as CartItem[]) {
         await tx.orderItem.create({
@@ -97,5 +96,31 @@ export async function createOrder() {
   } catch (error) {
     if (isRedirectError(error)) throw error;
     return { success: false, message: formatError(error) };
+  }
+}
+
+// getOrder
+export async function getOrderById(orderId: string) {
+  try {
+    const res = await prisma.order.findFirst({
+      where: {
+        id: orderId,
+      },
+      include: {
+        orderItems: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+    return converToPlainObject(res);
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
   }
 }

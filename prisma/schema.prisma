@@ -17,20 +17,21 @@ datasource db {
 // Product
 
 model Product {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
-  slug        String   @unique(map: "product_slug_idx")
+  slug        String      @unique(map: "product_slug_idx")
   category    String
   images      String[]
   brand       String
   description String
   stock       Int
-  price       Decimal  @default(0) @db.Decimal(12, 2)
-  rating      Decimal  @default(0) @db.Decimal(3, 2)
-  numReviews  Int      @default(0)
-  isFeatured  Boolean  @default(false)
+  price       Decimal     @default(0) @db.Decimal(12, 2)
+  rating      Decimal     @default(0) @db.Decimal(3, 2)
+  numReviews  Int         @default(0)
+  isFeatured  Boolean     @default(false)
   banner      String?
-  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  createdAt   DateTime    @default(now()) @db.Timestamp(6)
+  OrderItem   OrderItem[]
 }
 
 //  User
@@ -50,6 +51,7 @@ model User {
   account       Account[]
   session       Session[]
   Cart          Cart[]
+  Order         Order[]
 }
 
 //   Account
@@ -93,4 +95,39 @@ model Cart {
   totalPrice    Decimal  @db.Decimal(12, 2)
   createdAt     DateTime @default(now()) @db.Timestamp(6)
   user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "cart_userId_user_id_fk")
+}
+
+// Order
+
+model Order {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String      @db.Uuid
+  shippingAddress Json        @db.Json
+  paymentMethod   String
+  paymentResult   Json?       @db.Json
+  itemsPrice      Decimal     @db.Decimal(12, 2)
+  shippingPrice   Decimal     @db.Decimal(12, 2)
+  taxPrice        Decimal     @db.Decimal(12, 2)
+  totalPrice      Decimal     @db.Decimal(12, 2)
+  isPaid          Boolean     @default(false)
+  paidAt          DateTime?   @db.Timestamp(6)
+  isDelivered     Boolean     @default(false)
+  deliveredAt     DateTime?   @db.Timestamp(6)
+  createdAt       DateTime    @default(now()) @db.Timestamp(6)
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItems      OrderItem[]
+}
+
+model OrderItem {
+  orderId   String  @db.Uuid
+  productId String  @db.Uuid
+  qty       Int
+  price     Decimal @db.Decimal(12, 2)
+  name      String
+  slug      String
+  image     String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([orderId, productId], map: "orderitems_orderId_productId_pk")
 }

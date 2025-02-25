@@ -18,7 +18,12 @@ const OrderDetailsPage = async (props: {
   const order = (await getOrderById(id)) as unknown as Order;
   if (!order) notFound();
 
-  return <OrderDetailsTable order={order} />;
+  return (
+    <OrderDetailsTable
+      order={order}
+      paypalClientId={process.env.PAYPAL_CLIENT_ID || 'sb'}
+    />
+  );
 };
 
 export default OrderDetailsPage;

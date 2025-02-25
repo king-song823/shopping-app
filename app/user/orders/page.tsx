@@ -10,7 +10,7 @@ import { getMyOrders } from '@/lib/actions/order.action';
 import { formatCurrency, formatDateTime, formatId } from '@/lib/utils';
 import { Metadata } from 'next';
 import Link from 'next/link';
-
+import Pagination from '@/components/shared/pagination';
 export const metadata: Metadata = {
   title: 'My Orders',
 };
@@ -22,8 +22,6 @@ const OrdersPage = async (props: {
   const orders = await getMyOrders({
     page: Number(page) || 1,
   });
-
-  console.log(1111, orders);
 
   return (
     <>
@@ -72,6 +70,12 @@ const OrdersPage = async (props: {
               ))}
             </TableBody>
           </Table>
+          {(orders.totalPages as number) > 1 && (
+            <Pagination
+              page={Number(page) || 1}
+              totalPages={orders?.totalPages as number}
+            />
+          )}
         </div>
       </div>
     </>

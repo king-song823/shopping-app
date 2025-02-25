@@ -311,7 +311,6 @@ export async function getMyOrders({
         userId: session?.user?.id,
       },
     });
-    console.log('dataCount', Math.ceil(dataCount / limit));
     return {
       data,
       totalPages: Math.ceil(dataCount / limit),

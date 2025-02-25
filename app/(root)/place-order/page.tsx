@@ -19,7 +19,7 @@ import { getMyCart } from '@/lib/actions/cart.action';
 import { formatCurrency } from '@/lib/utils';
 import PlaceOrderForm from './place-order-form';
 
-export const metaData: Metadata = {
+export const metadata: Metadata = {
   title: 'Place Order',
 };
 

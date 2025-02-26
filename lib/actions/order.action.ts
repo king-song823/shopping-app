@@ -3,7 +3,7 @@
 import { CartItem, PaymentResult } from '@/types';
 
 import { auth } from '@/auth';
-import { converToPlainObject, formatError } from '../utils';
+import { converToPlainObject, formatError, handleError } from '../utils';
 import { getUserById } from './user.actions';
 import { getMyCart } from './cart.action';
 import { insertOrderSchema } from '../validator';
@@ -432,13 +432,6 @@ export async function deleteOrder(id: string) {
   } catch (error) {
     return handleError(error);
   }
-}
-
-function handleError(error: unknown) {
-  return {
-    success: false,
-    message: formatError(error),
-  };
 }
 
 // Update order to paid by COD

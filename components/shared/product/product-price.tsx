@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 const ProductPrice = ({
   value,
@@ -8,11 +8,11 @@ const ProductPrice = ({
   className?: string;
 }) => {
   const stringValue = value.toFixed(2);
-  const [intValue, floatValue] = stringValue.split(".");
+  const [intValue, floatValue] = stringValue.split('.');
 
   return (
-    <p className={cn("text-2xl", className)}>
-      <span className="text-xs align-super">¥</span>
+    <p className={cn('text-2xl', className)}>
+      <span className="text-xs align-super">$</span>
       {intValue}
       <span className="text-xs align-super">.{floatValue}</span>
     </p>

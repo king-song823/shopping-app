@@ -90,15 +90,15 @@ export const formatDateTime = (dateString: Date) => {
     hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
   };
   const formattedDateTime: string = new Date(dateString).toLocaleString(
-    'en-CN',
+    'en-US',
     dateTimeOptions
   );
   const formattedDate: string = new Date(dateString).toLocaleString(
-    'en-CN',
+    'en-US',
     dateOptions
   );
   const formattedTime: string = new Date(dateString).toLocaleString(
-    'en-CN',
+    'en-US',
     timeOptions
   );
   return {
@@ -135,4 +135,12 @@ export function formUrlQuery({
 const NUMBER_FORMATTER = new Intl.NumberFormat('en-US');
 export function formatNumber(number: number) {
   return NUMBER_FORMATTER.format(number);
+}
+
+export function handleError(error: unknown, params?: object) {
+  return {
+    success: false,
+    message: formatError(error),
+    ...params,
+  };
 }

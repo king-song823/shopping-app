@@ -72,7 +72,6 @@ const OrderDetailsTable = ({
   // Approves a PayPal order
   const handleApprovePayPalOrder = async (data: { orderID: string }) => {
     const res = await approvePayPalOrder(order.id, data);
-    console.log('res', res);
 
     toast({
       description: res.message,

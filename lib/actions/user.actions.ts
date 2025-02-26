@@ -90,7 +90,6 @@ export async function updateUserAddress(data: ShippingAddress) {
     const session = await auth();
     // find user
     const currentUser = await getUserById(session?.user?.id as string);
-    console.log('currentUser', currentUser);
     if (!currentUser) throw new Error('User not found');
 
     // params

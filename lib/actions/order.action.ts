@@ -62,7 +62,6 @@ export async function createOrder() {
 
     // Create a transaction to create order and order items in database
     const insertedOrderId = await prisma.$transaction(async (tx) => {
-      console.log('order', order);
       // Create order
       const insertedOrder = await tx.order.create({ data: order });
       // Create order items from the cart items
@@ -375,4 +374,44 @@ export async function getOrderSummary() {
     latestOrders,
     salesData,
   };
+}
+
+// Get all orders (Admin)
+export async function getAllOrders({
+  limit = PAGE_SIZE,
+  page,
+}: {
+  limit?: number;
+  page: number;
+}) {
+  try {
+    const data = await prisma.order.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    const dataCount = await prisma.order.count();
+    return {
+      success: true,
+      data,
+      totalPages: Math.ceil(dataCount / limit),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+      data: [],
+      totalPages: 0,
+    };
+  }
 }

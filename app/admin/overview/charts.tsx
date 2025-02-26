@@ -5,13 +5,13 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 const Charts = ({
   data: { salesData },
 }: {
-  data: { salesData: { month: string; totalSales: number }[] };
+  data: { salesData: { day: string; totalSales: number }[] };
 }) => {
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={salesData}>
         <XAxis
-          dataKey="month"
+          dataKey="day"
           stroke="#888888"
           fontSize={12}
           tickLine={false}

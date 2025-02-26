@@ -3,7 +3,7 @@
 import { CartItem, PaymentResult } from '@/types';
 
 import { auth } from '@/auth';
-import { converToPlainObject, formatError } from '../utils';
+import { converToPlainObject, formatError, handleError } from '../utils';
 import { getUserById } from './user.actions';
 import { getMyCart } from './cart.action';
 import { insertOrderSchema } from '../validator';
@@ -62,7 +62,6 @@ export async function createOrder() {
 
     // Create a transaction to create order and order items in database
     const insertedOrderId = await prisma.$transaction(async (tx) => {
-      console.log('order', order);
       // Create order
       const insertedOrder = await tx.order.create({ data: order });
       // Create order items from the cart items
@@ -227,7 +226,7 @@ async function updateOrderToPaid({
   paymentResult,
 }: {
   orderId: string;
-  paymentResult: PaymentResult;
+  paymentResult?: PaymentResult;
 }) {
   //Check order found
   const order = await prisma.order.findFirst({
@@ -326,7 +325,7 @@ export async function getMyOrders({
 }
 
 type SalesDataType = {
-  month: string;
+  day: string;
   totalSales: number;
 }[];
 // Get sales data and order summary
@@ -345,11 +344,10 @@ export async function getOrderSummary() {
 
   // Get monthly sales
   const salesDataRaw = await prisma.$queryRaw<
-    Array<{ month: string; totalSales: Prisma.Decimal }>
-  >`SELECT to_char("createdAt", 'MM/YY') as "month", sum("totalPrice") as "totalSales" FROM "Order" GROUP BY to_char("createdAt", 'MM/YY')`;
-
+    Array<{ day: string; totalSales: Prisma.Decimal }>
+  >`SELECT to_char("createdAt", 'YYYY-MM-DD') as "day", sum("totalPrice") as "totalSales" FROM "Order" GROUP BY to_char("createdAt", 'YYYY-MM-DD') ORDER BY "day" ASC`;
   const salesData: SalesDataType = salesDataRaw.map((entry) => ({
-    month: entry.month,
+    day: entry.day,
     totalSales: Number(entry.totalSales), // Convert Decimal to number
   }));
 
@@ -376,4 +374,100 @@ export async function getOrderSummary() {
     latestOrders,
     salesData,
   };
+}
+
+// Get all orders (Admin)
+export async function getAllOrders({
+  limit = PAGE_SIZE,
+  page,
+}: {
+  limit?: number;
+  page: number;
+}) {
+  try {
+    const data = await prisma.order.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    const dataCount = await prisma.order.count();
+    return {
+      success: true,
+      data,
+      totalPages: Math.ceil(dataCount / limit),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+      data: [],
+      totalPages: 0,
+    };
+  }
+}
+
+// Delete Order (Admin)
+export async function deleteOrder(id: string) {
+  try {
+    await prisma.order.delete({
+      where: {
+        id,
+      },
+    });
+    revalidatePath('/admin/orders');
+    return {
+      success: true,
+      message: 'Order deleted successfully',
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+// Update order to paid by COD
+export async function updateOrderToPaidByCOD(orderId: string) {
+  try {
+    await updateOrderToPaid({ orderId });
+    revalidatePath(`/order/${orderId}`);
+    return { success: true, message: 'Order paid successfully' };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+// Update Order To Delivered
+export async function deliverOrder(orderId: string) {
+  try {
+    const order = await prisma.order.findFirst({
+      where: {
+        id: orderId,
+      },
+    });
+    if (!order) throw new Error('Order not found');
+    if (!order.isPaid) throw new Error('Order is not paid');
+
+    await prisma.order.update({
+      where: {
+        id: orderId,
+      },
+      data: {
+        isDelivered: true,
+        deliveredAt: new Date(),
+      },
+    });
+    revalidatePath(`/order/${orderId}`);
+    return { success: true, message: 'Order delivered successfully' };
+  } catch (error) {
+    return handleError(error);
+  }
 }

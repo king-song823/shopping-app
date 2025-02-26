@@ -12,7 +12,6 @@ test('generate a Paypal token ', async () => {
 test('Create a Paypal order', async () => {
   const price = 10.0;
   const orderResponse = await paypal.createOrder(price);
-  console.log('orderResponse', orderResponse);
   expect(orderResponse).toHaveProperty('id');
   expect(orderResponse).toHaveProperty('status');
   expect(orderResponse.status).toBe('CREATED');

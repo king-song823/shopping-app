@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table';
 import Link from 'next/link';
 import Charts from './charts';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard',
@@ -23,12 +24,12 @@ const AdminOverviewPage = async () => {
   const session = await auth();
 
   // Make sure the user is an admin
-  if (session?.user.role !== 'admin')
-    throw new Error('admin permission required');
+  if (session?.user.role !== 'admin') {
+    redirect('/');
+  }
 
   // Get order summary
   const summary = await getOrderSummary();
-
   console.log('summary', summary);
 
   return (

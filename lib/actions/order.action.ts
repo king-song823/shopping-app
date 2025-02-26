@@ -326,7 +326,7 @@ export async function getMyOrders({
 }
 
 type SalesDataType = {
-  month: string;
+  day: string;
   totalSales: number;
 }[];
 // Get sales data and order summary
@@ -345,11 +345,10 @@ export async function getOrderSummary() {
 
   // Get monthly sales
   const salesDataRaw = await prisma.$queryRaw<
-    Array<{ month: string; totalSales: Prisma.Decimal }>
-  >`SELECT to_char("createdAt", 'MM/YY') as "month", sum("totalPrice") as "totalSales" FROM "Order" GROUP BY to_char("createdAt", 'MM/YY')`;
-
+    Array<{ day: string; totalSales: Prisma.Decimal }>
+  >`SELECT to_char("createdAt", 'YYYY-MM-DD') as "day", sum("totalPrice") as "totalSales" FROM "Order" GROUP BY to_char("createdAt", 'YYYY-MM-DD') ORDER BY "day" ASC`;
   const salesData: SalesDataType = salesDataRaw.map((entry) => ({
-    month: entry.month,
+    day: entry.day,
     totalSales: Number(entry.totalSales), // Convert Decimal to number
   }));
 

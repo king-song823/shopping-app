@@ -11,7 +11,7 @@ const Charts = ({
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={salesData}>
         <XAxis
-          dataKey="month"
+          dataKey="day"
           stroke="#888888"
           fontSize={12}
           tickLine={false}

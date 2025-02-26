@@ -415,3 +415,28 @@ export async function getAllOrders({
     };
   }
 }
+
+// Delete Order (Admin)
+export async function deleteOrder(id: string) {
+  try {
+    await prisma.order.delete({
+      where: {
+        id,
+      },
+    });
+    revalidatePath('/admin/orders');
+    return {
+      success: true,
+      message: 'Order deleted successfully',
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+function handleError(error: unknown) {
+  return {
+    success: false,
+    message: formatError(error),
+  };
+}

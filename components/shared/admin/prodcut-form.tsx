@@ -21,6 +21,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { createProduct, updateProduct } from '@/lib/actions/product.actions';
 import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { UploadButton } from '@/lib/uploadthing';
+import { Card, CardContent } from '@/components/ui/card';
+import Image from 'next/image';
 const ProductForm = ({
   type,
   product,
@@ -38,6 +41,8 @@ const ProductForm = ({
     defaultValues:
       product && type === 'Update' ? product : productDefaultValues,
   });
+
+  const images = form.watch('images');
 
   const router = useRouter();
 
@@ -239,6 +244,46 @@ const ProductForm = ({
         </div>
         <div className="upload-field flex flex-col gap-5 md:flex-row">
           {/* Images */}
+          <FormField
+            control={form.control}
+            name="images"
+            render={() => (
+              <FormItem className="w-full">
+                <FormLabel>Images</FormLabel>
+                <Card>
+                  <CardContent className="space-y-2 mt-2 min-h-48">
+                    <div className="flex-start space-x-2">
+                      {images.map((image: string) => (
+                        <Image
+                          key={image}
+                          src={image}
+                          alt="product image"
+                          className="w-20 h-20 object-cover object-center rounded-sm"
+                          width={100}
+                          height={100}
+                        />
+                      ))}
+                      <FormControl>
+                        <UploadButton
+                          endpoint="imageUploader"
+                          onClientUploadComplete={(res: { url: string }[]) => {
+                            form.setValue('images', [...images, res[0].url]);
+                          }}
+                          onUploadError={(error: Error) => {
+                            toast({
+                              variant: 'destructive',
+                              description: `ERROR! ${error.message}`,
+                            });
+                          }}
+                        />
+                      </FormControl>
+                    </div>
+                  </CardContent>
+                </Card>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         <div className="upload-field">{/* Is Featured */}</div>
         <div>

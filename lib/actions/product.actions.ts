@@ -130,3 +130,12 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
     return handleError(error);
   }
 }
+
+// Get single product by id
+export async function getProductById(productId: string) {
+  const data = await prisma.product.findFirst({
+    where: { id: productId },
+  });
+
+  return converToPlainObject(data);
+}

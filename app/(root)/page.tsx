@@ -2,6 +2,7 @@ import ProductList from '@/components/shared/product/product-list';
 import { getLastestProdcuts } from '@/lib/actions/product.actions';
 import { getFeaturedProducts } from '@/lib/actions/product.actions';
 import ProductCarousel from '@/components/shared/product/product-carousel';
+import ViewAllProductsButton from '@/components/view-all-products-button';
 export default async function Home() {
   const lastestProdcuts = await getLastestProdcuts();
   const featuredProducts = await getFeaturedProducts();
@@ -11,6 +12,7 @@ export default async function Home() {
         <ProductCarousel data={featuredProducts} />
       )}
       <ProductList title="Newest Arrivals" data={lastestProdcuts} />
+      <ViewAllProductsButton />
     </div>
   );
 }

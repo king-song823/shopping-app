@@ -12,7 +12,7 @@ export default async function Home() {
         <ProductCarousel data={featuredProducts} />
       )}
       <ProductList title="Newest Arrivals" data={lastestProdcuts} />
-      <ViewAllProductsButton />
+      {featuredProducts.length > 0 && <ViewAllProductsButton />}
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { formatCurrency, formatDateTime, formatId } from '@/lib/utils';
 import { Order } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
+
 import {
   PayPalButtons,
   PayPalScriptProvider,
@@ -28,7 +29,7 @@ import {
 import { toast, useToast } from '@/hooks/use-toast';
 import { useTransition } from 'react';
 import { Button } from '@/components/ui/button';
-
+import StripePayment from './stripe-payment';
 // Checks the loading status of the PayPal script
 function PrintLoadingState() {
   const [{ isPending, isRejected }] = usePayPalScriptReducer();
@@ -45,10 +46,12 @@ const OrderDetailsTable = ({
   order,
   paypalClientId,
   isAdmin,
+  stripeClientSecret,
 }: {
   order: Order;
   paypalClientId: string;
   isAdmin: boolean;
+  stripeClientSecret: string | null;
 }) => {
   const {
     shippingAddress,
@@ -228,6 +231,13 @@ const OrderDetailsTable = ({
                 <div>{formatCurrency(totalPrice)}</div>
               </div>
               {/* PayPal Payment */}
+              {!isPaid && paymentMethod === 'Stripe' && stripeClientSecret && (
+                <StripePayment
+                  priceInCents={Number(order.totalPrice) * 100}
+                  orderId={order.id}
+                  clientSecret={stripeClientSecret}
+                />
+              )}
               {!isPaid && paymentMethod === 'PayPal' && (
                 <div>
                   <PayPalScriptProvider options={{ clientId: paypalClientId }}>

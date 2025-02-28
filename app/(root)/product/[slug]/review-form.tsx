@@ -1,8 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm, SubmitHandler, ControllerRenderProps } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -30,16 +27,17 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { reviewFormDefaultValues } from '@/lib/constants';
+import { insertReviewSchema } from '@/lib/validator';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { StarIcon } from 'lucide-react';
+import { useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
 import {
   createUpdateReview,
   getReviewByProductId,
-} from '@/lib/actions/review.actions';
-import { reviewFormDefaultValues } from '@/lib/constants';
-import { insertReviewSchema } from '@/lib/validator';
-import { z } from 'zod';
-import { StarIcon } from 'lucide-react';
-
-type CustomerReview = z.infer<typeof insertReviewSchema>;
+} from '@/lib/actions/review.action';
 
 const ReviewForm = ({
   userId,
@@ -48,68 +46,101 @@ const ReviewForm = ({
 }: {
   userId: string;
   productId: string;
-  onReviewSubmitted?: () => void;
+  onReviewSubmitted: () => void;
 }) => {
   const [open, setOpen] = useState(true);
+
   const { toast } = useToast();
-  const form = useForm<CustomerReview>({
+
+  const form = useForm<z.infer<typeof insertReviewSchema>>({
     resolver: zodResolver(insertReviewSchema),
     defaultValues: reviewFormDefaultValues,
   });
-  const handleOpenForm = () => {};
+
+  // Open Form Handler
+  const handleOpenForm = async () => {
+    form.setValue('productId', productId);
+    form.setValue('userId', userId);
+
+    const review = await getReviewByProductId({ productId });
+
+    if (review) {
+      form.setValue('title', review.title);
+      form.setValue('description', review.description);
+      form.setValue('rating', review.rating);
+    }
+
+    setOpen(true);
+  };
+
+  // Submit Form Handler
+  const onSubmit: SubmitHandler<z.infer<typeof insertReviewSchema>> = async (
+    values
+  ) => {
+    const res = await createUpdateReview({ ...values, productId });
+
+    if (!res.success) {
+      return toast({
+        variant: 'destructive',
+        description: res.message,
+      });
+    }
+
+    setOpen(false);
+
+    onReviewSubmitted();
+
+    toast({
+      description: res.message,
+    });
+  };
+
   return (
-    <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <Button onClick={handleOpenForm} variant="default">
-          Write a review
-        </Button>
-        <DialogContent className="sm:max-w-[425px]">
-          <Form {...form}>
-            <form method="POST">
-              <DialogHeader>
-                <DialogTitle>Write a review</DialogTitle>
-                <DialogDescription>
-                  Share your thought with other customers
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <FormField
-                  name="title"
-                  control={form.control}
-                  render={({
-                    field,
-                  }: {
-                    field: ControllerRenderProps<
-                      z.infer<typeof insertReviewSchema>,
-                      'title'
-                    >;
-                  }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter tile" {...field}></Input>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button onClick={handleOpenForm} variant="default">
+        Write a Review
+      </Button>
+      <DialogContent className="sm:max-w-[425px]">
+        <Form {...form}>
+          <form method="POST" onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogHeader>
+              <DialogTitle>Write a Review</DialogTitle>
+              <DialogDescription>
+                Share your thoughts with other customers
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter title" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => {
+                  return (
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         <Textarea placeholder="Enter description" {...field} />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="rating"
-                  render={({ field }) => (
+                  );
+                }}
+              />
+              <FormField
+                control={form.control}
+                name="rating"
+                render={({ field }) => {
+                  return (
                     <FormItem>
                       <FormLabel>Rating</FormLabel>
                       <Select
@@ -118,7 +149,7 @@ const ReviewForm = ({
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a rating" />
+                            <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -135,14 +166,19 @@ const ReviewForm = ({
                       </Select>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </>
+                  );
+                }}
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit" size="lg" className="w-full">
+                {form.formState.isSubmitting ? 'Submitting...' : 'Submit'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

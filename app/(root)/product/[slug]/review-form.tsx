@@ -48,7 +48,7 @@ const ReviewForm = ({
   productId: string;
   onReviewSubmitted: () => void;
 }) => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const { toast } = useToast();
 

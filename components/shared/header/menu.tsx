@@ -1,6 +1,7 @@
 import { EllipsisVertical, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import UserButton from './user-button';
+import Search from './search';
 import {
   Sheet,
   SheetContent,
@@ -30,6 +31,9 @@ const Menu = async () => {
               <EllipsisVertical />
             </SheetTrigger>
             <SheetContent className="flex flex-col items-start">
+              <div className="mt-10">
+                <Search />
+              </div>
               <SheetTitle>Menu</SheetTitle>
               <ModeToggle />
               <Button asChild variant="ghost">

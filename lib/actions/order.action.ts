@@ -1,7 +1,5 @@
 'use server';
 
-import { CartItem, PaymentResult } from '@/types';
-
 import { auth } from '@/auth';
 import { converToPlainObject, formatError, handleError } from '../utils';
 import { getUserById } from './user.actions';
@@ -13,6 +11,8 @@ import { paypal } from '../paypal';
 import { revalidatePath } from 'next/cache';
 import { PAGE_SIZE } from '../constants';
 import { Prisma } from '@prisma/client';
+import { CartItem, PaymentResult, ShippingAddress } from '@/types';
+import { sendPurchaseReceipt } from '@/email';
 
 export async function createOrder() {
   try {
@@ -207,6 +207,7 @@ export async function approvePayPalOrder(
           captureData.purchase_units[0]?.payment?.capture[0]?.amount?.value,
       },
     });
+
     revalidatePath(`/order/${orderId}`);
     return {
       success: true,
@@ -283,6 +284,15 @@ export async function updateOrderToPaid({
     },
   });
   if (!updatedOrder) throw new Error('Order not found');
+  // Send the purchase receipt email with the updated order
+  sendPurchaseReceipt({
+    order: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...(updatedOrder as any),
+      shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+      paymentResult: updatedOrder.paymentResult as PaymentResult,
+    },
+  });
 }
 
 // Get User Order

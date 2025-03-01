@@ -284,11 +284,21 @@ export async function updateOrderToPaid({
     },
   });
   if (!updatedOrder) throw new Error('Order not found');
+  const params = {
+    ...updatedOrder,
+    orderItems: updatedOrder.orderItems?.map((i) => ({
+      ...i,
+      price: String(i.price),
+    })),
+    itemsPrice: String(updatedOrder.itemsPrice),
+    shippingPrice: String(updatedOrder.shippingPrice),
+    taxPrice: String(updatedOrder.taxPrice),
+    totalPrice: String(updatedOrder.totalPrice),
+  };
   // Send the purchase receipt email with the updated order
   sendPurchaseReceipt({
     order: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ...(updatedOrder as any),
+      ...params,
       shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
       paymentResult: updatedOrder.paymentResult as PaymentResult,
     },
